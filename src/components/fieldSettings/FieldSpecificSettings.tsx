@@ -1,6 +1,6 @@
 'use client';
 import { Field } from '@/types/form';
-import { Box, TextField, FormControlLabel, Checkbox } from '@mui/material';
+import { Box, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import SelectOptionsEditor from './SelectOptionsEditor';
 
 interface FieldSpecificSettingsProps {
@@ -16,44 +16,22 @@ export default function FieldSpecificSettings({ field, onUpdate }: FieldSpecific
   };
 
   switch (field.type) {
-    case 'Text':
-    case 'Textarea':
+    case 'ShortText':
+    case 'LongText':
       return (
         <Box>
-          <TextField
-            label="Minimum Length"
-            type="number"
-            fullWidth
-            margin="normal"
-            value={field.validation?.minLength || ''}
-            onChange={(e) => handleValidationChange('minLength', Number(e.target.value))}
-          />
-          <TextField
-            label="Maximum Length"
-            type="number"
-            fullWidth
-            margin="normal"
-            value={field.validation?.maxLength || ''}
-            onChange={(e) => handleValidationChange('maxLength', Number(e.target.value))}
-          />
-          <FormControlLabel
-            control={
-              <Checkbox
-                checked={field.validation?.isEmail || false}
-                onChange={(e) => handleValidationChange('isEmail', e.target.checked)}
-              />
-            }
-            label="Validate as Email"
-          />
-           <FormControlLabel
-            control={
-              <Checkbox
-                checked={field.validation?.isPassword || false}
-                onChange={(e) => handleValidationChange('isPassword', e.target.checked)}
-              />
-            }
-            label="Is a Password field (min 8 chars, 1 number)"
-          />
+            <FormControl fullWidth margin="normal">
+                <InputLabel>Input Format</InputLabel>
+                <Select
+                    value={field.validation?.format || 'text'}
+                    label="Input Format"
+                    onChange={(e) => handleValidationChange('format', e.target.value)}
+                >
+                    <MenuItem value="text">Plain Text</MenuItem>
+                    <MenuItem value="email">Email Address</MenuItem>
+                    <MenuItem value="phone">Phone Number</MenuItem>
+                </Select>
+            </FormControl>
         </Box>
       );
 
@@ -81,9 +59,8 @@ export default function FieldSpecificSettings({ field, onUpdate }: FieldSpecific
 
     case 'Select':
     case 'Radio':
+    case 'Checkbox':
       return <SelectOptionsEditor field={field} onUpdate={onUpdate} />;
-    
-    // Checkbox, Date, etc., have no extra settings for now, but can be added here.
     default:
       return null;
   }

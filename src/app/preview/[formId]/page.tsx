@@ -6,6 +6,8 @@ import { FormSchema } from '@/types/form';
 import { Container, Typography, Box, Button, Paper, CircularProgress } from '@mui/material';
 import RenderField from '@/components/RenderField';
 import { useDerivedFields } from '@/lib/useDerivedFields';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import Link from 'next/link';
 
 export default function SavedFormPreviewPage() {
@@ -63,22 +65,24 @@ export default function SavedFormPreviewPage() {
   }
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
-      <Paper elevation={3} sx={{ p: 4 }}>
-        <Typography variant="h4" component="h1" gutterBottom>
-          {formSchema.name}
-        </Typography>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          {formSchema.fields.map((field) => (
-            <RenderField key={field.id} field={field} control={control} />
-          ))}
-          <Box mt={3}>
-            <Button type="submit" variant="contained" color="primary" size="large">
-              Submit Form
-            </Button>
-          </Box>
-        </form>
-      </Paper>
-    </Container>
+    <LocalizationProvider dateAdapter={AdapterDateFns}>
+      <Container maxWidth="md" sx={{ py: 4 }}>
+        <Paper elevation={3} sx={{ p: 4 }}>
+          <Typography variant="h4" component="h1" gutterBottom>
+            {formSchema.name}
+          </Typography>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            {formSchema.fields.map((field) => (
+              <RenderField key={field.id} field={field} control={control} />
+            ))}
+            <Box mt={3}>
+              <Button type="submit" variant="contained" color="primary" size="large">
+                Submit Form
+              </Button>
+            </Box>
+          </form>
+        </Paper>
+      </Container>
+    </LocalizationProvider>
   );
 }
