@@ -50,6 +50,7 @@ export default function RenderField({ field, control }: RenderFieldProps) {
             return (
               <TextField
                 {...controllerField}
+                disabled={field.isDerived}
                 fullWidth
                 multiline={field.type === 'Textarea'}
                 rows={field.type === 'Textarea' ? 4 : 1}

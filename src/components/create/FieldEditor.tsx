@@ -6,6 +6,7 @@ import { Box, Paper, TextField, Stack, IconButton, Tooltip, FormControlLabel, Sw
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import FieldSpecificSettings from '../fieldSettings/FieldSpecificSettings';
+import DerivationSettings from '../fieldSettings/DerivationSettings';
 
 interface FieldEditorProps {
   field: Field;
@@ -23,6 +24,13 @@ export default function FieldEditor({ field, isSelected, onSelect, dragHandlePro
 
   const handleDelete = () => {
     dispatch(removeField(field.id));
+  };
+
+  const handleDerivedChange = (isDerived: boolean) => {
+    const changes = isDerived
+      ? { isDerived: true, defaultValue: '' }
+      : { isDerived: false, derivation: undefined };
+    handleUpdate(changes);
   };
 
   const borderStyle = isSelected ? { borderLeft: '3px solid', borderColor: 'primary.main' } : {};
@@ -58,8 +66,19 @@ export default function FieldEditor({ field, isSelected, onSelect, dragHandlePro
                 value={field.placeholder || ''}
                 onChange={(e) => handleUpdate({ placeholder: e.target.value })}
               />
+              <FormControlLabel
+                control={
+                  <Switch
+                    checked={field.isDerived || false}
+                    onChange={(e) => handleDerivedChange(e.target.checked)}
+                  />
+                }
+                label="Is a Derived Field"
+              />
+              {field.isDerived && (
+                  <DerivationSettings field={field} onUpdate={handleUpdate} />
+              )}
               <FieldSpecificSettings field={field} onUpdate={handleUpdate} />
-              
             </Stack>
           </Box>
         )}

@@ -5,22 +5,30 @@ import { useForm } from 'react-hook-form';
 import { FormSchema } from '@/types/form';
 import { Container, Typography, Box, Button, Paper, CircularProgress } from '@mui/material';
 import RenderField from '@/components/RenderField';
+import { useDerivedFields } from '@/lib/useDerivedFields';
 import Link from 'next/link';
 
 export default function SavedFormPreviewPage() {
   const [formSchema, setFormSchema] = useState<FormSchema | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const params = useParams();
-  const { control, handleSubmit } = useForm();
+  const formMethods = useForm();
+  const { handleSubmit, control } = formMethods;
   
   const { formId } = params;
+  useDerivedFields({ formSchema, useFormMethods: formMethods });
 
   useEffect(() => {
     if (typeof formId === 'string') {
-      const savedFormsStr = localStorage.getItem('forms');
-      const savedForms: FormSchema[] = savedFormsStr ? JSON.parse(savedFormsStr) : [];
-      const targetForm = savedForms.find((form) => form.id === formId);
-      setFormSchema(targetForm || null);
+      try {
+        const savedFormsStr = localStorage.getItem('forms');
+        const savedForms: FormSchema[] = savedFormsStr ? JSON.parse(savedFormsStr) : [];
+        const targetForm = savedForms.find((form) => form.id === formId);
+        setFormSchema(targetForm || null);
+      } catch (error) {
+        console.error("Error parsing forms from localStorage:", error);
+        setFormSchema(null);
+      }
     }
     setIsLoading(false);
   }, [formId]);

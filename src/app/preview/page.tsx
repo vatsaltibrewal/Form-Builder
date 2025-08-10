@@ -1,15 +1,31 @@
 'use client';
+import { useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { useAppSelector } from '@/lib/hooks';
 import { Container, Typography, Box, Button, Paper, Alert } from '@mui/material';
 import RenderField from '@/components/RenderField';
+import { useDerivedFields } from '@/lib/useDerivedFields';
+import { FormSchema } from '@/types/form';
 
 export default function LivePreviewPage() {
-  const formSchema = useAppSelector((state) => state.formBuilder);
-  const { control, handleSubmit } = useForm();
+  const formBuilderState = useAppSelector((state) => state.formBuilder);
+  const formMethods = useForm();
+  const { control, handleSubmit } = formMethods;
+  
+  const liveFormSchema: FormSchema = useMemo(() => ({
+    id: 'live-preview-id',
+    name: formBuilderState.formName,
+    createdAt: new Date().toISOString(),
+    fields: formBuilderState.fields,
+  }), [formBuilderState.formName, formBuilderState.fields]);
+
+  useDerivedFields({
+    formSchema: liveFormSchema,
+    useFormMethods: formMethods,
+  });
 
   const onSubmit = (data: any) => {
-    console.log('Form Submission Data:', data);
+    console.log('Live Preview Form Submission Data:', data);
     alert('Form submitted! Check the console for the data.');
   };
 
@@ -20,10 +36,10 @@ export default function LivePreviewPage() {
       </Alert>
       <Paper elevation={3} sx={{ p: 4 }}>
         <Typography variant="h4" component="h1" gutterBottom>
-          {formSchema.formName}
+          {liveFormSchema.name}
         </Typography>
         <form onSubmit={handleSubmit(onSubmit)}>
-          {formSchema.fields.map((field) => (
+          {liveFormSchema.fields.map((field) => (
             <RenderField key={field.id} field={field} control={control} />
           ))}
           <Box mt={3}>
